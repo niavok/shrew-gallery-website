@@ -162,7 +162,7 @@ class DisplayManager {
   function PrintFooter()
   {
     echo '      <div id="footer">'."\n";
-    echo '        <p id="copyright" > Copyright (C) 2009 Frédéric Bertolus</p>'."\n";
+    echo '        <p id="copyright" > Copyright (C) 2009 Frédéric Bertolus - fredb219@gmail.com</p>'."\n";
     echo '        <p id="licence" >This is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</p>'."\n";
     echo '        <p id="source" ></p>The source code can be found at the following URL : <a href="index.php?want=source">index.php</a></p>'."\n";
     echo '      </div>'."\n";//div footer
@@ -202,6 +202,7 @@ class DisplayManager {
     echo '         <li>Télécharger le fichier « index.php » de shrew-gallery et copiez le dans votre dossier</li>'."\n";
     echo '         <li>Ça y est ! Ça marche !</li>'."\n";
     echo '       </ul>'."\n";
+    echo '       <p>Version actuelle : 1.0.2</p>'."\n";
     echo '       <h2>Fonctionnalités</h2>'."\n";
 
     echo '       <p>Shrew gallery ne possède pas beaucoup de fonctionalités. En fait, il intègre pour le moment seulement l\essentiel : </p>'."\n";
@@ -225,13 +226,15 @@ class DisplayManager {
     echo '       </ul>'."\n";
     echo '       <h2>Installation</h2>'."\n";
     echo '       <h3>Téléchargement du code source</h3>'."\n";
-    echo '       <p>Vous pouvez télécharger le code source de shrew-gallery via le lien suivant : <a href="data/shrew-gallery_1.0.1.tar.gz" >shrew-gallery_1.0.1.tar.gz</a></p>'."\n";
+    echo '       <p>Vous pouvez télécharger le code source de shrew-gallery via le lien suivant : <a href="data/shrew-gallery-1.0.2.tar.gz" >shrew-gallery-1.0.2.tar.gz</a></p>'."\n";
+     echo '       <p>Les anciennes version peuvent être trouvés à l\'adresse : <a href="http://download.gna.org/shrew-gallery/" >http://download.gna.org/shrew-gallery</a>'."\n";
+
     echo '       <h3>Déploiement</h3>'."\n";
     echo '       <ul>'."\n";
     echo '       <li>Commencez par créer un dossier accessible par votre serveur web.</li>'."\n";
     echo '       <li>Ajoutez vos photos au dossier.</li>'."\n";
     echo '       <li>Zippez l\'ensemble des photos de l\'album en un fichier nommé « all.zip » (« zip all.zip *.jpg » par exemple).</li>'."\n";
-    echo '       <li>Extraire l\'archive contenant le code source (« tar xvzf shrew-gallery_1.0.1 » par exemple).</li>'."\n";
+    echo '       <li>Extraire l\'archive contenant le code source (« tar xvzf shrew-gallery-1.0.2 » par exemple).</li>'."\n";
     echo '       <li>Copier le fichier « index.php » situé dans le dossier « out » du code source vers le dossier contenant vos photos.</li>'."\n";
     echo '       </ul>'."\n";
     echo '       <h3>Configuration des droits d\'accés</h3>'."\n";
@@ -239,13 +242,14 @@ class DisplayManager {
     echo '       <p style="font-family: Courier;">//access login motdepasse</p>'."\n";
     echo '       <p>Un exemple est présent dans l\'archive contenant le code source dans le dossier « examples »</p>'."\n";
     echo '       <h2>Bugs et contributions</h2>'."\n";
-    echo '       <p>Il est possible que des bugs trainent. Si vous en trouvez, vous pouvez me les reporter à l\'adresse fredb219@gmail.com. Les contributions sont aussi bienvenues.</p>'."\n";
+    echo '       <p>Il est possible que des bugs trainent. Si vous en trouvez, vous pouvez me les reporter sur le gestionnaire de projet hébergé par gna.org : <a href="https://gna.org/projects/shrew-gallery/" >https://gna.org/projects/shrew-gallery</a>. Les contributions sont aussi bienvenues.</p>'."\n";
     echo '       <h2>Licence</h2>'."\n";
     echo '       <p>Shrew gallery est distribué sous licence GNU Affero General Public Licence version 3 ou plus. Vous pouvez consulter cette licence à l\'adresse suivante : <a href="http://www.fsf.org/licensing/licenses/agpl-3.0.html" >http://www.fsf.org/licensing/licenses/agpl-3.0.html</a></p>'."\n";
     echo '       <h2>Auteurs</h2>'."\n";
     echo '       <ul>'."\n";
     echo '       <li>FredB219 : Programmation</li>'."\n";
     echo '       <li>Yekcim : Mascotte/Logo</li>'."\n";
+    echo '       <li>Kévin Bihouis : Patch concernant les formats supportés</li>'."\n";
     echo '       </ul>'."\n";
     echo '      </div>'."\n";//div image
   }
