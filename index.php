@@ -260,15 +260,22 @@ class DisplayManager {
 	echo '       <p style="font-family: Courier;">//rule ./album1/album1.1 login1 group1 group2 login4 ...</p>'."\n";
 	echo '       <p>Un exemple est présent dans l\'archive contenant le code source dans le dossier « examples »</p>'."\n";
    
+    echo '       <h3>Affichage de la licence</h3>'."\n";
+	echo '       <p>Vous pouvez afficher la licence des photos en ajoutant un fichier « licence.txt » dans l\'albums correspondant. Le contenu du fichier (texte ou html) sera affiché en bas de la page. Si aucun de fichier de licence n\'est présent, la gallery va essayer d\'afficher la licence des albums parents.</p>'."\n";
+	
+	echo '       <h3>Utilisation de miniatures</h3>'."\n";
+	echo '       <p>Dans le cas de grandes photos, pour éviter un trop long temps de chargement, il est conseillé de créer des miniatures. La taille maximum pour une miniature est 800px de large. La miniature de « photo1.jpg » doit s\'intituler « photo1-thumb.jpg ».</p>'."\n";
+	
+   
     echo '       <h2>Source, bugs et contributions</h2>'."\n";
 	echo '       <p>Vous pouvez télécharger le code source de shrew-gallery via le lien suivant : <a href="http://download.gna.org/shrew-gallery/shrew-gallery-'.Config::$version.'.tar.gz" >shrew-gallery-'.Config::$version.'.tar.gz</a></p>'."\n";
-    echo '       <p>Les anciennes version peuvent être trouvés à l\'adresse : <a href="http://download.gna.org/shrew-gallery/" >http://download.gna.org/shrew-gallery</a>'."\n";
+    echo '       <p>Les anciennes versions peuvent être trouvées à l\'adresse : <a href="http://download.gna.org/shrew-gallery/" >http://download.gna.org/shrew-gallery</a>'."\n";
     echo '       <p>Il est possible que des bugs trainent. Si vous en trouvez, vous pouvez me les reporter sur le gestionnaire de projet hébergé par gna.org : <a href="https://gna.org/projects/shrew-gallery/" >https://gna.org/projects/shrew-gallery</a>. Les contributions sont aussi bienvenues.</p>'."\n";
     echo '       <h2>Licence</h2>'."\n";
     echo '       <p>Shrew gallery est distribué sous licence GNU Affero General Public Licence version 3 ou plus. Vous pouvez consulter cette licence à l\'adresse suivante : <a href="http://www.fsf.org/licensing/licenses/agpl-3.0.html" >http://www.fsf.org/licensing/licenses/agpl-3.0.html</a></p>'."\n";
     echo '       <h2>Auteurs</h2>'."\n";
     echo '       <ul>'."\n";
-    echo '       <li>FredB219 : Programmation</li>'."\n";
+    echo '       <li>FredB219 : Initiation/Programmation</li>'."\n";
     echo '       <li>Yekcim : Mascotte/Logo</li>'."\n";
     echo '       <li>Kévin Bihouis : Patch concernant les formats supportés</li>'."\n";
     echo '       </ul>'."\n";
