@@ -15,6 +15,9 @@
  *
  */
 
+class Config{
+ public static $version = '1.1.0';
+}
 class Logo {
   
   
@@ -196,52 +199,70 @@ class DisplayManager {
   function PrintBody()
   {
     echo '      <div  class="image-bloc">'."\n";
-    echo '       <p>Shrew gallery est un moteur de galerie d\'images sur internet utilisant PHP. Shrew gallery est un logiciel libre. Il existe de nombreuses « web gallery »  mais celle-ci se veux être extrêmement simple à mettre en place pour les personnes disposant d\un hébergement mutialisé ou d\'un serveur dédié :  </p>'."\n";
+    echo '       <p>Shrew gallery est un moteur de galerie d\'images sur internet utilisant PHP. Shrew gallery est un logiciel libre. Il existe de nombreuses « web gallery »  mais celle-ci se veux être extrêmement simple à mettre en place pour les personnes disposant d\'un hébergement mutialisé ou d\'un serveur dédié :  </p>'."\n";
     echo '       <ul>'."\n";
     echo '         <li>Créez un dossier est mettez-y vos photos</li>'."\n";
     echo '         <li>Télécharger le fichier « index.php » de shrew-gallery et copiez le dans votre dossier</li>'."\n";
     echo '         <li>Ça y est ! Ça marche !</li>'."\n";
     echo '       </ul>'."\n";
-    echo '       <p>Version actuelle : 1.0.2</p>'."\n";
+    echo '       <p>Version actuelle : '.Config::$version.'</p>'."\n";
     echo '       <h2>Fonctionnalités</h2>'."\n";
-
+	
     echo '       <p>Shrew gallery ne possède pas beaucoup de fonctionalités. En fait, il intègre pour le moment seulement l\essentiel : </p>'."\n";
     echo '       <ul>'."\n";
-    echo '         <li>Affichage des images JPEG contenues dans le dossier.</li>'."\n";
+    echo '         <li>Affichage des images, video (ogg/theora) et sons (ogg/vorbis).</li>'."\n";
+	echo '         <li>Creation d\'albums de manière automatique via l\'arborescence de dossier.</li>'."\n";
     echo '         <li>Présentation des images par pages et navigations basique.</li>'."\n";
-    echo '         <li>Controle d\'accès facultatif</li>'."\n";
-    echo '         <li>Mise à disposition du code source des versions modifiés pour faciliter le respect de la licence</li>'."\n";
+    echo '         <li>Controle d\'accès globable ou par album.</li>'."\n";
+	echo '         <li>Affichage de la licence des médias.</li>'."\n";
+	echo '         <li>Affichage des données EXIF contenues dans les photos.</li>'."\n";
+	echo '         <li>Possibilité d\'utiliser des miniatures.</li>'."\n";
+    echo '         <li>Mise à disposition du code source des versions modifiés pour faciliter le respect de la licence.</li>'."\n";
     echo '       </ul>'."\n";
 
     echo '       <p>Shrew gallery n\'est pas :</p>'."\n";
     echo '       <ul>'."\n";
-    echo '         <li>Sécurisé : il est quasiment certains que des failles de sécurités se cachent dans ce logiciel. N\'utilisez pas ce logiciel si vous données sont sensibles</li>'."\n";
-    echo '         <li>Optimisé : les images sont téléchargées sans passer par des miniatures. Le temps de téléchargement peut donc être long pour des images de grandes taille. N\'utiliser pas ce logiciel si vous voulez une gallerie très réactive et n\'utilisant que peu de bande passante.</li>'."\n";
+    echo '         <li>Sécurisé : il est quasiment certains que des failles de sécurités se cachent dans ce logiciel. N\'utilisez pas ce logiciel si vos données sont sensibles</li>'."\n";
+    echo '         <li>Optimisé : les images sont téléchargées sans forcement passer par des miniatures. Le temps de téléchargement peut donc être long pour des images de grandes taille. N\'utiliser pas ce logiciel si vous voulez une gallerie très réactive et n\'utilisant que peu de bande passante.</li>'."\n";
     echo '       </ul>'."\n";
+	
+	//Démonstration
     echo '       <h2>Démonstration</h2>'."\n";
-    echo '       <p>Deux galleries de démonstration sont à disposition pour avoir un aperçu rapide des fonctionnalités :</p>'."\n";
+    echo '       <p>Une gallerie de démonstration est à disposition pour avoir un aperçu rapide des fonctionnalités : <a href="demo" >demo</a>. Les identifiants des albums privés sont :</p>'."\n";
     echo '       <ul>'."\n";
-    echo '         <li>Une gallerie publique : <a href="demo" >demo</a></li>'."\n";
-    echo '         <li>Une gallerie privé. L\'identifiant et le mot de passe sont tous les deux « test » : <a href="protected_demo" >protected_demo</a></li>'."\n";
+	echo '         <li>Tous les albums - Login : admin - Mot de passe : password</li>'."\n";
+    echo '         <li>Album nature - Login : alice - Mot de passe : a</li>'."\n";
+	echo '         <li>Album ville - Login : bob - Mot de passe : b</li>'."\n";
     echo '       </ul>'."\n";
+	
+	//Installation
     echo '       <h2>Installation</h2>'."\n";
-    echo '       <h3>Téléchargement du code source</h3>'."\n";
-    echo '       <p>Vous pouvez télécharger le code source de shrew-gallery via le lien suivant : <a href="data/shrew-gallery-1.0.2.tar.gz" >shrew-gallery-1.0.2.tar.gz</a></p>'."\n";
-     echo '       <p>Les anciennes version peuvent être trouvés à l\'adresse : <a href="http://download.gna.org/shrew-gallery/" >http://download.gna.org/shrew-gallery</a>'."\n";
-
+    echo '       <h3>Téléchargement du programme</h3>'."\n";
+    echo '       <p>Pour obtenir shrew-gallery, il suffit de télécharger le fichier suivant : <a href="http://download.gna.org/shrew-gallery/index.php" >index.php</a></p>'."\n";
+	
     echo '       <h3>Déploiement</h3>'."\n";
     echo '       <ul>'."\n";
     echo '       <li>Commencez par créer un dossier accessible par votre serveur web.</li>'."\n";
-    echo '       <li>Ajoutez vos photos au dossier.</li>'."\n";
+    echo '       <li>Ajoutez vos photos au dossier ou dans des sous-dossiers.</li>'."\n";
     echo '       <li>Zippez l\'ensemble des photos de l\'album en un fichier nommé « all.zip » (« zip all.zip *.jpg » par exemple).</li>'."\n";
-    echo '       <li>Extraire l\'archive contenant le code source (« tar xvzf shrew-gallery-1.0.2 » par exemple).</li>'."\n";
-    echo '       <li>Copier le fichier « index.php » situé dans le dossier « out » du code source vers le dossier contenant vos photos.</li>'."\n";
+    echo '       <li>Copier le fichier « index.php » téléchargé précedement vers le dossier contenant vos photos.</li>'."\n";
+	echo '       <p>À ce moment vous devriez avoir une gallerie fonctionnel ouverte à tout le monde.</p>'."\n";
     echo '       </ul>'."\n";
+	
     echo '       <h3>Configuration des droits d\'accés</h3>'."\n";
-    echo '       <p>Si vous voulez restraindre l\'accès à votre galerie, créez dans le même dossier que vos photos un fichier « access.php ». Éditez ce  fichier et à l\'intérieur de balise PHP, ajouter des lignes suivant cette syntaxe :</p>'."\n";
+    echo '       <p>Si vous voulez restreindre l\'accès à votre galerie, créez dans le même dossier que vos photos un fichier « access.php ». La creation  de ce fichier vérouille l\'accès au public de l\'ensemble de la gallery, seul les utilisateurs authentifiés peuvent alors y acceder. Pour ajouter des utilisateurs, éditez ce  fichier et à l\'intérieur de balises PHP, ajouter des lignes suivant cette syntaxe :</p>'."\n";
     echo '       <p style="font-family: Courier;">//access login motdepasse</p>'."\n";
-    echo '       <p>Un exemple est présent dans l\'archive contenant le code source dans le dossier « examples »</p>'."\n";
-    echo '       <h2>Bugs et contributions</h2>'."\n";
+	echo '       <p>Vous pouvez ajouter autant d\'utilisateur que vous le voulez. Par défaut, l\'authentification ouvre l\'accés à l\'ensemble de la galerie. Pour configurer l\'accès d\'un album en particulier, il faut ajouter une règle suivant la syntaxe suivante :</p>'."\n";
+    echo '       <p style="font-family: Courier;">//rule ./album1 login1 login2 ...</p>'."\n";
+	echo '       <p>Une règle défini les conditions d\'accès pour l\'album ciblé ainsi que tous les albums fils ne disposant pas de règle spécifiques. Il est possible de remplacer la liste de login par le pseudo-login « public » pour rendre un album public.</p>'."\n";
+    echo '       <p>Pour faciliter la gestion des droits, il est possible de définir des groupes et de introduire dans des règles :</p>'."\n";
+	echo '       <p style="font-family: Courier;">//group group1 login2 login3 ...</p>'."\n";
+	echo '       <p style="font-family: Courier;">//rule ./album1/album1.1 login1 group1 group2 login4 ...</p>'."\n";
+	echo '       <p>Un exemple est présent dans l\'archive contenant le code source dans le dossier « examples »</p>'."\n";
+   
+    echo '       <h2>Source, bugs et contributions</h2>'."\n";
+	echo '       <p>Vous pouvez télécharger le code source de shrew-gallery via le lien suivant : <a href="http://download.gna.org/shrew-gallery/shrew-gallery-'.Config::$version.'.tar.gz" >shrew-gallery-'.Config::$version.'.tar.gz</a></p>'."\n";
+    echo '       <p>Les anciennes version peuvent être trouvés à l\'adresse : <a href="http://download.gna.org/shrew-gallery/" >http://download.gna.org/shrew-gallery</a>'."\n";
     echo '       <p>Il est possible que des bugs trainent. Si vous en trouvez, vous pouvez me les reporter sur le gestionnaire de projet hébergé par gna.org : <a href="https://gna.org/projects/shrew-gallery/" >https://gna.org/projects/shrew-gallery</a>. Les contributions sont aussi bienvenues.</p>'."\n";
     echo '       <h2>Licence</h2>'."\n";
     echo '       <p>Shrew gallery est distribué sous licence GNU Affero General Public Licence version 3 ou plus. Vous pouvez consulter cette licence à l\'adresse suivante : <a href="http://www.fsf.org/licensing/licenses/agpl-3.0.html" >http://www.fsf.org/licensing/licenses/agpl-3.0.html</a></p>'."\n";
