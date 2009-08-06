@@ -90,13 +90,13 @@ class Style {
     
     .image-infos-bloc
     {
-      float:left;
+		margin : 30px;
+      float:right;
     }
     
     .image-infos
     { 
-      margin-bottom : 15px;
-      margin-right : 15px;
+     	
       padding-bottom : 10px;
       padding-top : 10px;
       padding-right : 10px;
@@ -198,6 +198,22 @@ class DisplayManager {
 
   function PrintBody()
   {
+	  //Menu
+	echo '      <div  class="image-infos-bloc">'."\n";
+	echo '      <div  class="image-infos">'."\n";
+	 echo '       <ul>'."\n";
+    echo '         <li><a href=#features >Fonctionnalités</a></li>'."\n";
+    echo '         <li><a href=#demo >Démonstration</a></li>'."\n";
+    echo '         <li><a href=#install >Installation</a></li>'."\n";
+	echo '         <li><a href=#contrib >Source, bugs et contributions</a></li>'."\n";
+	echo '         <li><a href=#licence >Licence</a></li>'."\n";
+	echo '         <li><a href=#authors >Auteurs</a></li>'."\n";
+	echo '         <li><a href=#changelog >Historique des versions</a></li>'."\n";
+    echo '       </ul>'."\n";
+	echo '      </div>'."\n"; 
+	echo '      </div>'."\n"; 
+	 
+	 //Body
     echo '      <div  class="image-bloc">'."\n";
     echo '       <p>Shrew gallery est un moteur de galerie d\'images sur internet utilisant PHP. Shrew gallery est un logiciel libre. Il existe de nombreuses « web gallery »  mais celle-ci se veux être extrêmement simple à mettre en place pour les personnes disposant d\'un hébergement mutialisé ou d\'un serveur dédié :  </p>'."\n";
     echo '       <ul>'."\n";
@@ -206,13 +222,13 @@ class DisplayManager {
     echo '         <li>Ça y est ! Ça marche !</li>'."\n";
     echo '       </ul>'."\n";
     echo '       <p>Version actuelle : '.Config::$version.'</p>'."\n";
-    echo '       <h2>Fonctionnalités</h2>'."\n";
+    echo '       <h2 id=features>Fonctionnalités</h2>'."\n";
 	
-    echo '       <p>Shrew gallery ne possède pas beaucoup de fonctionalités. En fait, il intègre pour le moment seulement l\essentiel : </p>'."\n";
+    echo '       <p>Shrew gallery ne possède pas beaucoup de fonctionalités. En fait, il intègre pour le moment seulement l\'essentiel : </p>'."\n";
     echo '       <ul>'."\n";
-    echo '         <li>Affichage des images, video (ogg/theora) et sons (ogg/vorbis).</li>'."\n";
+    echo '         <li>Affichage des images, videos (ogg/theora) et sons (ogg/vorbis).</li>'."\n";
 	echo '         <li>Creation d\'albums de manière automatique via l\'arborescence de dossier.</li>'."\n";
-    echo '         <li>Présentation des images par pages et navigations basique.</li>'."\n";
+    echo '         <li>Présentation des images par pages et navigation basique.</li>'."\n";
     echo '         <li>Controle d\'accès globable ou par album.</li>'."\n";
 	echo '         <li>Affichage de la licence des médias.</li>'."\n";
 	echo '         <li>Affichage des données EXIF contenues dans les photos.</li>'."\n";
@@ -227,7 +243,7 @@ class DisplayManager {
     echo '       </ul>'."\n";
 	
 	//Démonstration
-    echo '       <h2>Démonstration</h2>'."\n";
+    echo '       <h2 id=demo >Démonstration</h2>'."\n";
     echo '       <p>Une gallerie de démonstration est à disposition pour avoir un aperçu rapide des fonctionnalités : <a href="demo" >demo</a>. Les identifiants des albums privés sont :</p>'."\n";
     echo '       <ul>'."\n";
 	echo '         <li>Tous les albums - Login : admin - Mot de passe : password</li>'."\n";
@@ -236,7 +252,7 @@ class DisplayManager {
     echo '       </ul>'."\n";
 	
 	//Installation
-    echo '       <h2>Installation</h2>'."\n";
+    echo '       <h2 id=install >Installation</h2>'."\n";
     echo '       <h3>Téléchargement du programme</h3>'."\n";
     echo '       <p>Pour obtenir shrew-gallery, il suffit de télécharger le fichier suivant : <a href="http://download.gna.org/shrew-gallery/index.php" >index.php</a></p>'."\n";
 	
@@ -265,20 +281,73 @@ class DisplayManager {
 	
 	echo '       <h3>Utilisation de miniatures</h3>'."\n";
 	echo '       <p>Dans le cas de grandes photos, pour éviter un trop long temps de chargement, il est conseillé de créer des miniatures. La taille maximum pour une miniature est 800px de large. La miniature de « photo1.jpg » doit s\'intituler « photo1-thumb.jpg ».</p>'."\n";
-	
+	echo '       <p>Voici un petit script permettant de preparer les images provenant d\'un appareil photo :</p>'."\n";
+	echo '       <p style="font-family: Courier;">for img in `ls *.jpg`<br/>
+do<br/>
+	thumb=`echo $img| sed \'s/^\(.*\).jpg$/\1-thumb.jpg/\'`<br/>
+	<br/>
+	convert $img -resize 800x $thumb<br/>
+	convert $thumb -auto-orient $thumb<br/>
+	convert $img -auto-orient $img<br/>
+done</p>'."\n";
+	echo '       <p>Attention, ce script est destructif pour les images du dossier dans lequel il est executé. Il nécessite imagemagick et une version complète est présente dans les exemples du code source.</p>'."\n";
+
    
-    echo '       <h2>Source, bugs et contributions</h2>'."\n";
+    echo '       <h2 id=contrib >Source, bugs et contributions</h2>'."\n";
 	echo '       <p>Vous pouvez télécharger le code source de shrew-gallery via le lien suivant : <a href="http://download.gna.org/shrew-gallery/shrew-gallery-'.Config::$version.'.tar.gz" >shrew-gallery-'.Config::$version.'.tar.gz</a></p>'."\n";
     echo '       <p>Les anciennes versions peuvent être trouvées à l\'adresse : <a href="http://download.gna.org/shrew-gallery/" >http://download.gna.org/shrew-gallery</a>'."\n";
     echo '       <p>Il est possible que des bugs trainent. Si vous en trouvez, vous pouvez me les reporter sur le gestionnaire de projet hébergé par gna.org : <a href="https://gna.org/projects/shrew-gallery/" >https://gna.org/projects/shrew-gallery</a>. Les contributions sont aussi bienvenues.</p>'."\n";
-    echo '       <h2>Licence</h2>'."\n";
+    echo '       <h2 id=licence>Licence</h2>'."\n";
     echo '       <p>Shrew gallery est distribué sous licence GNU Affero General Public Licence version 3 ou plus. Vous pouvez consulter cette licence à l\'adresse suivante : <a href="http://www.fsf.org/licensing/licenses/agpl-3.0.html" >http://www.fsf.org/licensing/licenses/agpl-3.0.html</a></p>'."\n";
-    echo '       <h2>Auteurs</h2>'."\n";
+    echo '       <h2 id=authors>Auteurs</h2>'."\n";
     echo '       <ul>'."\n";
     echo '       <li>FredB219 : Initiation/Programmation</li>'."\n";
     echo '       <li>Yekcim : Mascotte/Logo</li>'."\n";
     echo '       <li>Kévin Bihouis : Patch concernant les formats supportés</li>'."\n";
     echo '       </ul>'."\n";
+	
+	echo '       <h2 id=changelog>Historique des versions</h2>'."\n";
+	
+	echo '       <h3>Version 1.1.0 - 07/08/2009</h3>'."\n";
+	echo '       <ul>'."\n";
+	echo '        <li>Ajout du multi-album</li>'."\n";
+    echo '        <li>Ajout des règles d\'accés avancés</li>'."\n";
+    echo '        <li>Support des données EXIF</li>'."\n"; 
+	echo '        <li>Affichage de la licence</li>'."\n";
+	echo '        <li>Miniatures</li>'."\n";
+	echo '        <li>Support du ogg (theora/vorbis)</li>'."\n";
+    echo '       </ul>'."\n";
+	
+	echo '       <h3>Version 1.0.2 - 13/07/2009</h3>'."\n";
+	echo '       <ul>'."\n";
+	echo '        <li>Support amélioré du jpeg (merci à Kévin Bihouis)</li>'."\n";
+    echo '       </ul>'."\n";
+	
+	echo '       <h3>Version 1.0.1 - 13/07/2009</h3>'."\n";
+	echo '       <ul>'."\n";
+	echo '        <li>Ajout du logo (merci à yekcim)</li>'."\n";
+    echo '        <li>Support du bmp et du png</li>'."\n";
+    echo '       </ul>'."\n";
+	
+	echo '       <h3>Version 1.0.0 - 12/07/2009</h3>'."\n";
+	echo '       <ul>'."\n";
+	echo '        <li>Système de galerie</li>'."\n";
+    echo '        <li>Système d\'authentification</li>'."\n";
+    echo '       </ul>'."\n";
+	/*
+
+> 2009/07/13 - 1.0.2 release
+  - 
+
+> 2009/07/13 - 1.0.1 release
+  - Add logo (thanks to yekcim)
+  - Support more format (png, bmp)
+  
+> 2009/07/12 - 1.0.0 release
+  - Gallery system
+  - Authentication system
+	*/
+	
     echo '      </div>'."\n";//div image
   }
   
