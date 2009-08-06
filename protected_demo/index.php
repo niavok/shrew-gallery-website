@@ -15,6 +15,38 @@
  *
  */
 
+class Config {
+  private static $instance;
+  public $path = '.';       
+  public $licenceFileName = 'licence.txt';
+  public $version = '1.1.0';
+  
+  static function SetInstance($instance){
+    self::$instance = $instance;
+  }
+  
+  static function GetInstance(){
+    return self::$instance;
+  }
+  
+  function Load()
+  {
+    if(isset($_GET['path']))
+    {
+      $this->path = $_GET['path'];
+    }	    
+  }
+  
+  function GetScriptName(){
+    return $_SERVER['SCRIPT_NAME'];
+  }
+  
+  function GetPath(){
+    return $this->path;
+  }
+}
+
+
 class Logo {
   
   
@@ -91,11 +123,33 @@ class Style {
       background-color : rgb(20,20,20);
       border : 1px solid rgb(30,30,30);
       padding : 10px;
+      overflow : auto;
+    }
+    
+    .login-bloc
+    { margin : 15px;
+      margin-top : 50px;
+      background-color : rgb(20,20,20);
+      border : 1px solid rgb(30,30,30);
+      padding : 10px;
+    }
+    
+    .licence
+    { margin : 25px;
+      background-color : rgb(20,20,20);
+      border : 1px solid rgb(30,30,30);
+      padding : 10px;
     }
     
     .image-infos-bloc
     {
       float:left;
+      
+    }
+    
+    .image-infos-bloc-right
+    {
+      float:right;
       
     }
     
@@ -124,7 +178,7 @@ class Style {
       text-align : center;
     }
     
-    #logout
+    #top_menu
     {
       float : right;
     }
@@ -136,6 +190,15 @@ class Style {
       
     }
     
+    .album
+    {
+      background-color : rgb(20,20,20);
+      border : 1px solid rgb(30,30,30);
+      padding : 0px;
+      padding-left : 20px;
+      margin : 3px;
+    }
+    
     .error
     {
       color : red;
@@ -145,20 +208,67 @@ class Style {
 }
 
 
-class Config {
-  function Load()
-  {
-  	
+class LinkManager{
+ private $album;
+ private static $instance;
+  
+  static function SetInstance($instance){
+    self::$instance = $instance;
   }
+  
+  static function GetInstance(){
+    return self::$instance;
+  }
+ 
+  public function SetAlbum($album){
+    $this->album = $album;
+  }
+ 
+ public function Generate(){
+   return "index.php?path=".$this->album->GetPath();
+ }
+ 
+ public function GenerateParent(){
+   return "index.php?path=".$this->album->GetParentPath();
+ }
+ 
+ public function GenerateWant($want){
+   return $this->Generate().'&want='.$want;
+ }
+ 
+ public function GeneratePath($path){
+   return "index.php?path=".$path;
+ }
+ 
 }
 
 
 class LoginManager {
   private $loginList = array();
   private $passwordList = array();
+  private $rulesList = array();
+  private $rulesMembersList = array();
+  private $groupList = array();
+  private $groupMembersList = array();
+  
+  private $login = 'public';
   private $access_locked = false;
-  function WantLogin()
-  {
+  
+  private static $instance;
+  
+  static function SetInstance($instance){
+    self::$instance = $instance;
+  }
+  
+  static function GetInstance(){
+    return self::$instance;
+  }
+ 
+  public function SetAlbum($album){
+    $this->album = $album;
+  }
+  
+  function WantLogin(){
     if(!isset($_GET['want']))
     {
       return false;
@@ -166,8 +276,7 @@ class LoginManager {
     return ($_GET['want'] == 'login');
   }
   
-  function WantLogout()
-  {
+  function WantLogout(){
     if(!isset($_GET['want']))
     {
       return false;
@@ -175,34 +284,28 @@ class LoginManager {
     
     return ($_GET['want'] == 'logout');
   }
-  
-  function IsLogged()
-  {
-    if($this->access_locked)
-    {
-      if(isset($_SESSION['logged']) and $_SESSION['logged'] == 'yes')
-      {
-        return true;
-      } else {
-        return false;
-      }
-    } else {
+ 
+  function IsLogged(){
+    if($this->login == 'public'){
+      return false;
+    }else{
       return true;
     }
   }
   
-  function TryLogin()
-  {
+  function TryLogin(){
     $login = $_POST['login'];
     $password = $_POST['password'];
     $success = false;
+    $this->login = 'public';
 
     if(($pos = array_search($login,$this->loginList)) !==false)
     {
       if($this->passwordList[$pos] == $password)
       {
         $success = true;
-        $_SESSION['logged'] = 'yes'; 
+        $_SESSION[$this->GetLoginSessionKey()] = $login;
+        $this->login = $login; 
       }
       
     }
@@ -213,11 +316,11 @@ class LoginManager {
   function Logout()
   {
     session_destroy();
-    $_SESSION['logged'] = 'no'; 
+    $_SESSION[$this->GetLoginSessionKey()] = 'public'; 
+    $this->login = 'public';
   }
   
-  function Load()
-  {
+  function Load(){
     session_start();
     if(file_exists("access.php"))
     {
@@ -225,28 +328,326 @@ class LoginManager {
       $this->access_locked = true;
       while($ligne = fgets($conf_file))
       {
-        if(preg_match("#^//access ([a-zA-Z0-9]+) ([a-zA-Z0-9]+)$#", $ligne))
+        
+        //Load access
+        if(preg_match("#^//access ([-_a-zA-Z0-9]+) ([-_a-zA-Z0-9]+)$#", $ligne))
         {
           $ligne = str_replace("\n", "", $ligne); 
-          $login = preg_replace("#^//access ([a-zA-Z0-9]+) ([a-zA-Z0-9]+)$#",'$1',$ligne);
-          $password = preg_replace("#^//access ([a-zA-Z0-9]+) ([a-zA-Z0-9]+)$#",'$2',$ligne);
+          $login = preg_replace("#^//access ([-_a-zA-Z0-9]+) ([-_a-zA-Z0-9]+)$#",'$1',$ligne);
+          $password = preg_replace("#^//access ([-_a-zA-Z0-9]+) ([-_a-zA-Z0-9]+)$#",'$2',$ligne);
           $this->loginList[] = $login;
           $this->passwordList[] = $password;
-
+          continue;
         }
+        
+        //Load group
+        if(preg_match("#^//group ([-_a-zA-Z0-9]+)( ([-_a-zA-Z0-9]+))*$#", $ligne))
+        {
+          $ligne = str_replace("\n", "", $ligne); 
+          $group = preg_replace("#^//group ([-_a-zA-Z0-9]+)( ([-_a-zA-Z0-9]+))*$#",'$1',$ligne);
+          $this->groupList[] = $group;
+          
+          $groupMembers = array();
+          $groupMembersLine = preg_replace("#^//group ([-_a-zA-Z0-9]+)(( ([-_a-zA-Z0-9]+))*)$#",'$2',$ligne);
+          
+          while($groupMembersLine != ''){
+            $groupMembers[] = preg_replace("#^ ([-_a-zA-Z0-9]+)(( ([-_a-zA-Z0-9]+))*)$#",'$1',$groupMembersLine);
+            
+            $groupMembersLine = preg_replace("#^ ([-_a-zA-Z0-9]+)(( ([-_a-zA-Z0-9]+))*)$#",'$2',$groupMembersLine);          
+          }
+          
+          $this->groupMembersList[$group] = $groupMembers;
+          continue;
+        }
+        
+        //Load rule
+        if(preg_match("#^//rule ([-_./a-zA-Z0-9]+)( ([-_a-zA-Z0-9]+))*$#", $ligne))
+        {
+          $ligne = str_replace("\n", "", $ligne); 
+          $rule = preg_replace("#^//rule ([-_./a-zA-Z0-9]+)( ([-_a-zA-Z0-9]+))*$#",'$1',$ligne);
+          $this->rulesList[] = $rule;
+          $ruleMembers = array();
+          if(preg_match("#^//rule ([-_./a-zA-Z0-9]+)( ([-_a-zA-Z0-9]+))+$#", $ligne)){
+            $ruleMembersLine = preg_replace("#^//rule ([-_./a-zA-Z0-9]+)(( ([-_a-zA-Z0-9]+))+)$#",'$2',$ligne);
+            while($ruleMembersLine != ''){
+              $ruleMembers[] = preg_replace("#^ ([-_a-zA-Z0-9]+)(( ([-_a-zA-Z0-9]+))*)$#",'$1',$ruleMembersLine);
+              
+              $ruleMembersLine = preg_replace("#^ ([-_a-zA-Z0-9]+)(( ([-_a-zA-Z0-9]+))*)$#",'$2',$ruleMembersLine);          
+            }
+          }
+          
+          $this->rulesMembersList[$rule] = $ruleMembers;
+          continue;
+        }
+        
       }
      
       fclose($conf_file);
     } else {
       $this->access_locked = false;
     }
+    
+    //Load current session
+    if(isset($_SESSION[$this->GetLoginSessionKey()])){
+      $this->login = $_SESSION[$this->GetLoginSessionKey()];
+    }else{
+      $this->login = 'public';
+    }
+  }
+  
+  function GetLoginSessionKey()
+  {
+    $key = 'login_'.__FILE__;
+   return $key;
+  }
+  
+  function IsAccessAllowed($album)
+  {
+    //Test if access file control access
+    if($this->access_locked)
+    {
+      //Access restricted
+      if($this->IsRule($album->GetPath()))
+      {
+        //Custom access rules
+        $accessList = $this->GetRule($album->GetPath());
+        if(count($accessList) == 0){
+          //Access forbidden for all
+          return false;
+        }
+        if(count($accessList) == 1 && $accessList[0] == 'public'){
+          //Access allowed for all
+          return true;
+        }
+        $accessLogin = $this->ExpandGroups($accessList);
+        if(in_array($this->login,$accessLogin)){
+          //Login found
+          return true;
+        }else{
+          //Login not match
+          return false;
+        }
+      }else{
+        
+        if($album->GetPath() == '.'){
+          //Use default access
+          if(count($this->loginList) > 0) {
+            //Need login
+            if($this->login == 'public'){
+              //Not logged
+              return false;
+            }else{
+              if(in_array($this->login,$this->loginList)){
+                //Login found
+                return true;
+              }else{
+                //Login not match
+                return false;
+              }
+            }
+            
+          }else{
+            //Nobody can acess
+            return false;
+          }
+        }else{
+          //Use the parent access rules
+          return $this->IsAccessAllowed($album->GetParent());
+        }
+      }
+    }else{
+      //Public Access
+      return true;
+    }
+  }
+  
+  function IsRule($path){
+    if(in_array($path,$this->rulesList)){
+      return true;
+    }else{
+      return false;
+    }
+  }
+  
+  function GetRule($path){
+    return $this->rulesMembersList[$path];
+  }
+  
+  function ExpandGroups($groups){
+    $accessList = array();
+    foreach($groups as $group){
+      $accessList = array_merge($accessList,$this->ExpandGroup($group));
+    }
+    return $accessList;
+  }
+  
+  function ExpandGroup($group){
+    
+    $accessList = array();
+    
+    if(!in_array($group,$this->groupList)){
+      $accessList[] = $group; 
+    }else{    
+      foreach($this->groupMembersList[$group] as $groupMember)
+      {
+        if(in_array($groupMember,$this->groupList)){
+          $groupContent = $this->ExpandGroup($groupMember);
+          $accessList = array_merge($accessList,$groupContent);
+        }else{
+          $accessList[] = $groupMember;
+        } 
+      }
+    }
+    return $accessList;
   }
 
+  function GetCurrentLogin(){
+    return $this->login;
+  }
 }
 
 
-class Image {
+class Metadatas {
+  public $count;
+  public $date;
+  public $model;
+  public $focalLength;
+  public $exposure;
+  public $focale;
+  public $iso;
+  public $flash;
+  
+  function Load($path)
+  {
+    
+    //init
+    $this->count = 0;
+    $this->model ='';
+    $this->date ='';
+    $this->focalLength = '';
+    $this->exposure='';
+    $this->focale='';
+    $this->iso='';
+    $flash=false;
+    
+    if(!$this->IsExifAvailable()){return;}
+  /*  
+    echo "$path:<br />\n";
+    
+    echo $exif===false ? "Aucun en-tête de donnés n'a été trouvé.<br />\n" : "L'image contient des en-têtes<br />\n";
+*/
+    /*$exif = exif_read_data($path, 0, true);
+    echo "$path:<br />\n";
+    foreach ($exif as $key => $section) {
+        foreach ($section as $name => $val) {
+            echo "$key.$name: $val<br />\n";
+      }
+    }*/
+    
+    $ifd0 = exif_read_data($path, 'IFD0');
+    
+    if($ifd0 !== false){
+    
+      //Model
+      if(array_key_exists('Model',$ifd0)){
+        if($ifd0['Model'] == 'NIKON D90'){
+          $this->model = 'Nikon D90';
+        }elseif($ifd0['Make'] == 'Canon'){
+          $this->model = $ifd0['Model'];
+        }
+		else{
+          $this->model = $ifd0['Make'].' '.$ifd0['Model'];
+        }
+        $this->count++;
+      }
+      
+      //date
+      if(array_key_exists('DateTime',$ifd0)){
+        $this->date = $ifd0['DateTime'];
+        $this->count++;
+      }
+    }
+    
+    $exif = exif_read_data($path, 'EXIF');
+    
+    if($exif !== false){
+    
+    
+      //FocalLength
+      if(array_key_exists('FocalLength',$exif)){
+        $this->focalLength = $exif['FocalLength'];
+        if(preg_match('#^([0-9]+)/([0-9]+)$#i',$this->focalLength)){
+          $num = preg_replace('#^([0-9]+)/([0-9]+)$#i','$1',$this->focalLength);
+          $den = preg_replace('#^([0-9]+)/([0-9]+)$#i','$2',$this->focalLength);
+          $this->focalLength = ($num/$den).'mm';
+        }
+        $this->count++;
+      }
+      
+      //Exposure time
+      if(array_key_exists('ExposureTime',$exif)){
+        $this->exposure = $exif['ExposureTime'];
+        if(preg_match('#^([0-9]+)/([0-9]+)$#i',$this->exposure)){
+          $num = preg_replace('#^([0-9]+)/([0-9]+)$#i','$1',$this->exposure);
+          $den = preg_replace('#^([0-9]+)/([0-9]+)$#i','$2',$this->exposure);
+          if($num<$den){
+            $this->exposure = '1/'.($den/$num);
+          }
+          $this->exposure = $this->exposure.'s';
+        }
+        $this->count++;
+      }
+      
+      //Focale
+      if(array_key_exists('FNumber',$exif)){
+        $this->focale = $exif['FNumber'];
+        if(preg_match('#^([0-9]+)/([0-9]+)$#i',$this->focale)){
+          $num = preg_replace('#^([0-9]+)/([0-9]+)$#i','$1',$this->focale);
+          $den = preg_replace('#^([0-9]+)/([0-9]+)$#i','$2',$this->focale);
+          $this->focale = ($num/$den);
+        }
+        $this->focale = 'f/'.$this->focale;
+        $this->count++;
+      }
+      
+      //ISO
+      if(array_key_exists('ISOSpeedRatings',$exif)){
+        $this->iso = 'ISO '.$exif['ISOSpeedRatings'];
+        
+        $this->count++;
+      }
+      
+      //Flash
+      if(array_key_exists('Flash',$exif)){
+        if($exif['Flash'] != 0){
+          $this->flash = true;
+        }
+        
+        $this->count++;
+      }
+      
+      
+    }
+    
+    
+  }
+  
+  
+  function IsExifAvailable()
+  {
+      if (extension_loaded('exif')) {
+        return true;
+      }else{
+        return false;
+      }
+      
+  } 
+}
+
+
+class Media {
   private $m_path='';
+  private $type;
   function GetPath()
   {
     return $this->m_path;
@@ -256,27 +657,151 @@ class Image {
   {
     $this->m_path = $path;
   }
+  
+  function GetMetadatas()
+  {
+    $metas = new Metadatas();
+    $metas->Load($this->GetPath());
+    return $metas;
+  }
+  
+  function GetType()
+  {
+    return $this->type;
+  }
+  
+  function SetType($type){
+    $this->type = $type;
+  }
+}
+
+class Ogg {
+  private $path;
+  
+  public function __construct($path){
+    $this->path = $path;
+  }
+  
+  function IsOgg(){
+    $isOgg;
+    $handle = fopen($this->path,'rb');
+    
+    $type = fread($handle,4);
+    if($type === false){
+      $isOgg = false;
+    }else{
+      $isOgg = ($type == 'OggS');
+    }
+    
+    fclose($handle);
+    return $isOgg;
+  }
+  
+  function GetCodec(){
+    if(!$this->IsOgg()){ 
+      return false;
+    }
+    
+    $codec;
+    $handle = fopen($this->path,'rb');
+    
+    //Read begin of header
+    fread($handle,0x1D);
+    
+    $codec = fread($handle,6);
+    
+    fclose($handle);
+    return $codec;
+  }
 }
 
 
-class ImageManager {
-  function GetImages()
-  {
-    $dir = opendir('.');
-    $images = array();
+class Video extends Media{
+  
+  function __construct(){
+    $this->SetType('video');
+  }
+}
 
-    while ($f = readdir($dir)) {
-       if(is_file($f)) {
-         if($this->IsImage($f))
+
+class Audio extends Media{
+  
+  function __construct(){
+    $this->SetType('audio');
+  }
+}
+
+
+class Image extends Media{
+  
+  function __construct(){
+    $this->SetType('image');
+  }
+    
+  function GetWidth(){
+    $size = getimagesize($this->GetPath());
+    return $size[0];
+  }
+  
+  function GetHeight(){
+    $size = getimagesize($this->GetPath());
+    return $size[1];
+  }
+  
+  function GetThumb(){
+    $name = preg_replace('!^(.*)(\.[a-zA-Z0-9]+)$!','$1',$this->GetPath());
+    $extension = preg_replace('!^(.*)(\.[a-zA-Z0-9]+)$!','$2',$this->GetPath());
+   
+     if(file_exists($name.'-thumb'.$thumbIndex.$extension)){
+        $thumb = new Image();
+        $thumb->SetPath($name.'-thumb'.$thumbIndex.$extension);
+        return $thumb;
+    }else{
+		return $this;
+	}
+   
+  }
+}
+
+
+class MediaManager {
+  function GetMedias($path)
+  {
+    $dir = opendir($path);
+    $medias = array();
+	$files = array();
+	while(false !== ($f = readdir($dir))) {
+	    if($f != '..' && is_file($path.'/'.$f)) {
+			$files[] = $f;
+		}
+	}
+	
+	sort($files);
+	
+	foreach($files as $f){
+         if($this->IsImage($path.'/'.$f))
          {
            $image = new Image();
-           $image->SetPath($f);
-           $images[] = $image;
+           $image->SetPath($path.'/'.$f);
+           $medias[] = $image;
+         }
+         if($this->IsVideo($path.'/'.$f))
+         {
+           $video = new Video();
+           $video->SetPath($path.'/'.$f);
+           $medias[] = $video;
+         }
+         
+         if($this->IsAudio($path.'/'.$f))
+         {
+           $audio = new Audio();
+           $audio->SetPath($path.'/'.$f);
+           $medias[] = $audio;
          }
        }
-    } 
+   
     closedir($dir);
-    return $images;
+    return $medias;
   }
   
   function IsImage($f)
@@ -302,29 +827,346 @@ class ImageManager {
       $is_image = true;
     }
     
+    if($is_image){
+      if(preg_match('#^(.*)-thumb\.([0-9a-wA-Z])#',$f)){
+        //Is thumb
+        $is_image = false;
+      }
+    }
     return $is_image;
 
+  }
+  function IsVideo($f)
+  {
+    $is_video = false;
+    if(preg_match('#.ogv$#i',$f))
+    {
+      $is_video = true;
+    }
+    
+    if(preg_match('#.ogg$#i',$f))
+    {
+      $is_video = true;
+    }
+    
+    
+    if($is_video){
+      $ogg = new Ogg($f);
+      $is_video = ($ogg->GetCodec() == 'theora');
+    }
+
+    
+    return $is_video;
+
+  }
+  
+  function IsAudio($f)
+  {
+    $is_audio = false;
+    
+    if(preg_match('#.oga$#i',$f))
+    {
+      $is_audio = true;
+    }
+    
+    if(preg_match('#.ogg$#i',$f))
+    {
+      $is_audio = true;
+    }
+    
+    if($is_audio){
+      $ogg = new Ogg($f);
+      $is_audio = ($ogg->GetCodec() == 'vorbis');
+    }
+    
+    return $is_audio;
+
+  }
+  
+  
+  
+  
+}
+
+
+class Album {
+  private $m_path='.';
+  function GetPath()
+  {
+    return $this->m_path;
+  }
+
+  function GetParentPath(){
+  	if($this->m_path == '.'){
+		return;
+    }
+    return preg_replace('!^(.*)/([-a-zA-Z_.]+)$!','$1',$this->m_path);
+  }
+  
+  function SetPath($path)
+  {
+    $this->m_path = $path;
+  }
+
+  function GetName()
+  {
+	return preg_replace('!^\./(.*)$!','$1',$this->m_path);
+  }
+
+  function GetMediaCount()
+  {
+    $mediaManager = new MediaManager();
+    $medias = $mediaManager->GetMedias($this->m_path);
+    return count($medias);
+
+  }
+  
+  function GetImageCount()
+  {
+    return count($this->GetImages());
+  }
+  
+  function GetVideoCount()
+  {
+    return count($this->VideoImages());
+  }
+
+  function GetTotalMediaCount()
+  {
+    $count = $this->GetMediaCount();
+    $albumManager = new AlbumManager();
+    $childAlbums = $this->GetChildAlbums();
+    foreach($childAlbums as $album){
+      $count += $album->GetMediaCount();
+    }
+    return $count;
+  }
+  
+  function GetTotalImageCount()
+  {
+    $count = $this->GetImageCount();
+    $albumManager = new AlbumManager();
+    $childAlbums = $this->GetChildAlbums();
+    foreach($childAlbums as $album){
+      $count += $album->GetImageCount();
+    }
+    return $count;
+  }
+  
+  function GetTotalVideoCount()
+  {
+    $count = $this->GetVideoCount();
+    $albumManager = new AlbumManager();
+    $childAlbums = $this->GetChildAlbums();
+    foreach($childAlbums as $album){
+      $count += $album->GetVideoCount();
+    }
+    return $count;
+  }
+
+  function GetMedias()
+  { 
+    $mediaManager = new MediaManager();
+    return $mediaManager->GetMedias($this->m_path);
+  }
+  
+  function GetImages(){
+    $medias = $this->GetMedias();
+    $images = array();
+    foreach($medias as $media){
+      if($media->GetType() == 'image'){
+        $images[] = $media;
+      }
+    }
+    return $images;
+  }
+
+  function GetVideos(){
+    $medias = $this->GetMedias();
+    $videos = array();
+    foreach($medias as $media){
+      if($media->GetType() == 'video'){
+        $videos[] = $media;
+      }
+    }
+    return $videos;
+  }
+
+  function GetAudios(){
+    $medias = $this->GetMedias();
+    $audios = array();
+    foreach($medias as $media){
+      if($media->GetType() == 'audio'){
+        $audios[] = $media;
+      }
+    }
+    return $audios;
+  }  
+
+  
+  function GetChildAlbums()
+  {
+    $albumManager = new AlbumManager();
+    return $albumManager->GetAlbums($this->GetPath());
+  }
+  
+  function GetDescription()
+  {
+    $out = '';
+    $images = $this->GetImages();
+    $videos = $this->GetVideos();
+    $audios = $this->GetAudios();
+    $albums = $this->GetChildAlbums();
+    
+    $texts = array();
+             
+    if(count($images)>0){
+        $texts[] = count($images).' image'.(count($images)>1?'s':'');
+    }
+    
+    if(count($videos)>0){
+        $texts[] = count($videos).' video'.(count($videos)>1?'s':'');
+    }
+    
+    if(count($audios)>0){
+        $texts[] = count($audios).' musique'.(count($audios)>1?'s':'');
+    }
+    
+    
+    if(count($this->GetChildAlbums()) > 0) {
+      $albumDesc = count($albums).' album'.(count($this->GetChildAlbums())>1?'s':'');
+      if($this->GetTotalImageCount()-$this->GetImageCount() != 0){
+        $albumDesc .= ' ('.$this->GetTotalMediaCount().' élément'.($this->GetTotalMediaCount()>1?'s':'').')';
+      }
+      $texts[] = $albumDesc;
+    }
+    
+    if(count($texts) ==0)
+    {
+      $out = 'album vide';
+    }else{
+      for($i =0; $i < count($texts); $i++){
+        $out.=$texts[$i];
+        if($i < count($texts) -2){
+          $out.=', ';
+        }
+        if($i == count($texts)-2){
+          $out.=' et ';
+        }
+        
+      }
+    }
+    
+    return $out;
+  }
+  
+  function GetParent(){
+    $album = new Album();
+    $album->SetPath($this->GetParentPath());
+    return $album;
+  }
+  
+  function IsLicence(){
+    
+    if(file_exists($this->GetPath().'/'.Config::GetInstance()->licenceFileName)){
+      if($this->ReadLicence() == ''){
+        return false;
+      }else{
+        return true;
+      }
+    }elseif($this->IsRootAlbum()){
+      return false;
+    }else{
+      return $this->GetParent()->IsLicence();
+    }
+  }
+  
+  function GetLicence(){
+    if(file_exists($this->GetPath().'/'.Config::GetInstance()->licenceFileName)){
+      return $this->ReadLicence();
+    }elseif($this->IsRootAlbum()){
+      return '';
+    }else{
+      return $this->GetParent()->ReadLicence();
+    }
+  }
+  
+  function ReadLicence(){
+    $licence = '';
+    $file = fopen($this->GetPath().'/'.Config::GetInstance()->licenceFileName,"r");
+
+    while ($line = fgets($file))
+    {
+      $licence .=$line;
+    }
+
+    fclose($file);
+    
+    return $licence;
+  }
+
+  function IsRootAlbum(){
+    return ($this->GetPath() == '.');
   }
 }
 
 
-class DisplayManager {
-  function DisplayImagesPage($images)
+class AlbumManager {
+  function GetAlbums($path)
   {
-      $this->PrintHtmlHeader(true);
-      $this->PrintImagesPageHeader($images);
-      $this->PrintImagesPageBody($images);
-      $this->PrintFooter();
+    $dir = opendir($path);
+    $albums = array();
+
+    while ($f = readdir($dir)) {
+       if($f != '..' && $f !='.'  && is_dir($path.'/'.$f)) {
+          $album = new Album();
+          $album->SetPath($path.'/'.$f);
+	  $albums[] = $album;
+       }
+    } 
+    closedir($dir);
+    return $albums;
   }
   
-  function DisplayLoginPage($loginFail)
+}
+
+
+class DisplayManager {
+  public $currentAlbum;
+  public $childAlbumList;  
+  function DisplayImagesPage($album)
   {
-    $this->PrintHtmlHeader(false);
+    $this->currentAlbum = $album;
+    $this->childAlbumList = $album->GetChildAlbums();
+    $this->PrintHtmlHeader();
+    $this->PrintImagesPageHeader();
+    $this->PrintAlbumsPageBody();
+    $this->PrintImagesPageBody();
+    $this->PrintFooter();
+  }
+  
+  function DisplayLoginPage($album,$loginFail)
+  {
+    $this->currentAlbum = $album;
+    $this->PrintHtmlHeader();
     $this->PrintLoginForm($loginFail);
     $this->PrintFooter();
   }
   
-  function PrintHtmlHeader($logout)
+  function DisplayAccessRefusedPage($album){
+    $this->currentAlbum = $album;
+    $this->PrintHtmlHeader();
+    $this->PrintAccessRefusedPageBody();
+    $this->PrintFooter();
+  }
+  
+  function DisplayHelpPage(){
+    $this->PrintHtmlHeader();
+    $this->PrintHelpPageBody();
+    $this->PrintFooter();
+  }
+  
+  function PrintHtmlHeader()
   {  
     $style = new Style();
     echo '<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">'."\n";
@@ -338,42 +1180,54 @@ class DisplayManager {
     echo '  </head>'."\n";
     echo '  <body>'."\n";
     echo '  <div id="page">'."\n";
-    if($logout)
-    {
-      echo '    <div id=logout><a href=index.php?want=logout >Déconnection</a></div>'."\n";
+    echo '<div id=top_menu>'."\n";
+    
+    if($this->currentAlbum && $this->currentAlbum->GetPath() != '.'){
+            echo '  <a href="'.LinkManager::GetInstance()->GenerateParent().'" >Album parent</a> '."\n";
     }
+    if(LoginManager::GetInstance()->GetCurrentLogin() != 'public')
+    {
+      echo '    <a href="'.LinkManager::GetInstance()->GenerateWant('logout').'" >Déconnection ('.LoginManager::GetInstance()->GetCurrentLogin().')</a>'."\n";
+    }
+    echo '</div>'."\n";
     echo '    <h1>Shrew gallery</h1>'."\n";
   }
   
   function PrintFooter()
   {
     echo '      <div id="footer">'."\n";
-    echo '        <p id="copyright" ></p>Powered by <a href="http://shrew-gallery.b219.org" >Shrew-gallery v1.0.2</a> - Copyright (C) 2009 Frédéric Bertolus</p>'."\n";
+    echo '        <p id="copyright" ></p>Powered by <a href="http://shrew-gallery.b219.org" >Shrew-gallery v'.Config::GetInstance()->version.'</a> - Copyright (C) 2009 Frédéric Bertolus</p>'."\n";
     echo '        <p id="licence" >Shrew-gallery is free software: you can redistribute it and/or modify it under the terms of the GNU Affero General Public License as published by the Free Software Foundation, either version 3 of the License, or (at your option) any later version.</p>'."\n";
-    echo '        <p id="source" ></p>The source code can be found at the following URL : <a href="index.php?want=source">index.php</a></p>'."\n";
+    echo '        <p id="source" ></p>The source code can be found at the following URL : <a href="'.LinkManager::GetInstance()->GenerateWant('source').'">'.Config::GetInstance()->GetScriptName().'</a></p>'."\n";
     echo '      </div>'."\n";//div footer
     echo '    </div>'."\n";//div page
     echo '  </body>'."\n";
     echo '</html>';
   }
   
-  function PrintImagesPageHeader($images)
+  function PrintImagesPageHeader()
   {
-    
-    if($images)
+    $medias = $this->currentAlbum->GetMedias();
+    if(count($medias)>0 || count($this->childAlbumList) > 0)
     { 
-      echo '<p>Cette galerie contient '.count($images).' images. Vous pouvez télécharger l\'intégralité de la galerie en suivant ce lien : <a href=all.zip >all.zip</a>.</p>'."\n";
+            echo '<p>Cet album contient ';
+            echo $this->currentAlbum->GetDescription();
+            echo '. ';
+            if(file_exists($this->currentAlbum->GetPath().'/all.zip')){
+                echo '<br /><br />Vous pouvez télécharger l\'intégralité de cet album en suivant ce lien : <a href='.$this->currentAlbum->GetPath().'/all.zip >all.zip</a>.';
+            }
+            echo '</p>'."\n";
     } else {
       echo '      <div  class="image-bloc">'."\n";
-      echo '        Cette galerie ne contient aucune image'."\n";
+      echo '        Cet album est vide.'."\n";
       echo '      </div>'."\n";//div image
     }
   }
   
-  function PrintImagesPageBody($images)
+  function PrintImagesPageBody()
   {
-    
-    if($images)
+    $medias = $this->currentAlbum->GetMedias();
+    if($medias)
     {
       $start = 0;
       $count = 8;
@@ -383,7 +1237,7 @@ class DisplayManager {
       }
       
       if($start <0) { $start = 0;}
-      if($start >=count($images)) { $start = count($images)-1;}
+      if($start >=count($medias)) { $start = count($medias)-1;}
       
       
       if(isset($_GET['count']))
@@ -393,56 +1247,173 @@ class DisplayManager {
       $end = $start+$count;
       
       if($end <0) { $end = 0;}
-      if($end >count($images)) { $end = count($images);}
+      if($end >count($medias)) { $end = count($medias);}
       
       
-      echo '<p><form action="index.php" method="get">Images par page : <input name=start type=hidden value="'.$start.'"/><input type=text name=count size=2 value="'.$count.'"/> <input type=submit value=OK /></form></p>'."\n";
+      echo '<p><form action="'.LinkManager::GetInstance()->Generate().'" method="get">Élements par page : <input name=start type=hidden value="'.$start.'"/><input name=path type=hidden value="'.$this->currentAlbum->GetPath().'"/><input type=text name=count size=2 value="'.$count.'"/> <input type=submit value=OK /></form></p>'."\n";
       
       for($index = $start; $index < $end; $index++)
       {
-        $image = $images[$index];
+        // Print each media
+        if($medias[$index]->GetType() == 'image')
+        {
+          $this->DisplayImage($medias,$index,$count,$start,$end);
+        }
+        
+        if($medias[$index]->GetType() == 'video')
+        {
+          $this->DisplayVideo($medias,$index,$count,$start,$end);
+        }
+        
+         if($medias[$index]->GetType() == 'audio')
+        {
+          $this->DisplayAudio($medias,$index,$count,$start,$end);
+        }
+        
+      }
+      
+      if($this->currentAlbum->IsLicence()){
+        echo '        <div class="licence">'."\n";
+        echo '        <p>'.$this->currentAlbum->GetLicence().'</p>'."\n";
+        echo '        </div>'."\n";
+      }
+      
+    }
+   
+  }
+  
+  function DisplayImage($medias,$index,$count,$start,$end){
+    $images = $medias;
+    $image = $medias[$index];
         echo '      <div id="image-'.$index.'" class="image-bloc">'."\n";
         echo '        <div class="image-infos-bloc">'."\n";
         echo '        <div class="image-infos">'."\n";
-        echo '          <h1>Image '.($index+1).' sur '.count($images).'</h1>'."\n";
+        echo '          <h1>Image - '.($index+1).' sur '.count($images).'</h1>'."\n";
         echo '          <ul>'."\n";
         echo '           <li><a href="'.$image->GetPath().'" >Original</a></li>'."\n";
         echo '          </ul>'."\n";
         echo '        </div>'."\n";
+        $this->DisplayControls($medias,$index,$count,$start,$end);//Metadatas
+        $metadatas = $image->GetMetadatas();
+        if($metadatas->count > 0){
+          echo '        <div class="image-infos">'."\n";
+          echo '          <h1>Métadonnées</h1>'."\n";
+          echo '          <ul>'."\n";
+          if($metadatas->date != '') {
+            echo '           <li>'.$metadatas->date.'</li>'."\n";
+          }
+          if($metadatas->model != '') {
+            echo '           <li>'.$metadatas->model.'</li>'."\n";
+          }
+          if($metadatas->focalLength != '') {
+            echo '           <li>'.$metadatas->focalLength.'</li>'."\n";
+          }
+          if($metadatas->exposure != '') {
+            echo '           <li>'.$metadatas->exposure.'</li>'."\n";
+          }
+          if($metadatas->focale != '') {
+            echo '           <li>'.$metadatas->focale.'</li>'."\n";
+          }
+          if($metadatas->iso != '') {
+            echo '           <li>'.$metadatas->iso.'</li>'."\n";
+          }
+          if($metadatas->flash == true) {
+            echo '           <li>Flash</li>'."\n";
+          }
+          
+          echo '          </ul>'."\n";
+          echo '        </div>'."\n";
+        }
+         
+        echo '        </div>'."\n";    
+        //Display image
+        echo '        <div class="image">'."\n";
+		$width = $image->GetThumb()->GetWidth();
+        echo '        <img src="'.$image->GetThumb()->GetPath().'" width='.($width>800?'800':$width).'px />'."\n";
+        echo '        </div>'."\n";
+        echo '      </div>'."\n";//div image
+  }
+
+
+function DisplayVideo($medias,$index,$count,$start,$end){
+    $images = $medias;
+    $video = $medias[$index];
+        echo '      <div id="image-'.$index.'" class="image-bloc">'."\n";
+        echo '        <div class="image-infos-bloc">'."\n";
         echo '        <div class="image-infos">'."\n";
+        echo '          <h1>Video - '.($index+1).' sur '.count($images).'</h1>'."\n";
+        echo '          <ul>'."\n";
+        echo '           <li><a href="'.$video->GetPath().'" >Original</a></li>'."\n";
+        echo '          </ul>'."\n";
+        echo '        </div>'."\n";
+        $this->DisplayControls($medias,$index,$count,$start,$end);
+        echo '        </div>'."\n";    
+        //Display video
+        echo '        <div class="video">'."\n";
+        echo '        <video controls=true src="'.$video->GetPath().'">Votre navigateur ne respecte pas suffisement les standards. Vous pouvez néanmoins téléchager la vidéo ici : <a href="'.$video->GetPath().'" >Original</a></video>'."\n";
+        echo '        </div>'."\n";
+        echo '      </div>'."\n";//div video
+  }
+  
+  function DisplayAudio($medias,$index,$count,$start,$end){
+    $images = $medias;
+    $audio = $medias[$index];
+        echo '      <div id="image-'.$index.'" class="image-bloc">'."\n";
+        echo '        <div class="image-infos-bloc">'."\n";
+        echo '        <div class="image-infos">'."\n";
+        echo '          <h1>Musique - '.($index+1).' sur '.count($images).'</h1>'."\n";
+        echo '          <ul>'."\n";
+        echo '           <li><a href="'.$audio->GetPath().'" >Original</a></li>'."\n";
+        echo '          </ul>'."\n";
+        echo '        </div>'."\n";
+        $this->DisplayControls($medias,$index,$count,$start,$end);
+         
+        echo '        </div>'."\n";    
+        //Display audio
+        echo '        <div class="video">'."\n";
+        echo '        <audio controls=true src="'.$audio->GetPath().'">Votre navigateur ne respecte pas suffisement les standards. Vous pouvez néanmoins téléchager la fichier ici : <a href="'.$audio->GetPath().'" >Original</a></audio>'."\n";
+        echo '        </div>'."\n";
+        echo '      </div>'."\n";//div video
+  }
+
+
+  function DisplayControls($medias,$index,$count,$start,$end){
+    echo '        <div class="image-infos">'."\n";
         echo '          <ul>'."\n";
         echo '           <li><a href="#page" >Haut de la page</a></li>'."\n";
         if($index>0){
-          echo '           <li><a href="#image-'.($index-1).'" >Image précédente</a></li>'."\n";
+          echo '           <li><a href="#image-'.($index-1).'" >Élément précédent</a></li>'."\n";
         }
         if($index<($end-1)){
-          echo '           <li><a href="#image-'.($index+1).'" >Image suivante</a></li>'."\n";
+          echo '           <li><a href="#image-'.($index+1).'" >Élément suivant</a></li>'."\n";
         }
         echo '           <li><a href="#footer" >Bas de la page</a></li>'."\n"; 
         echo '          </ul>'."\n";
         echo '          <ul>'."\n";
         
         if($start>0){
-          echo '           <li><a href="index.php?count='.$count.'" >Première page</a></li>'."\n";
-          echo '           <li><a href="index.php?start='.($start-$count).'&count='.$count.'" >Page précédente</a></li>'."\n";
+          echo '           <li><a href="'.LinkManager::GetInstance()->Generate().'&count='.$count.'" >Première page</a></li>'."\n";
+          echo '           <li><a href="'.LinkManager::GetInstance()->Generate().'&start='.($start-$count).'&count='.$count.'" >Page précédente</a></li>'."\n";
         }
-        if($end<count($images)){
-          echo '           <li><a href="index.php?start='.($start+$count).'&count='.$count.'" >Page suivante</a></li>'."\n";
-          echo '           <li><a href="index.php?start='.(count($images)-$count).'&count='.$count.'" >Dernière page</a></li>'."\n"; 
+        if($end<count($medias)){
+          echo '           <li><a href="'.LinkManager::GetInstance()->Generate().'&start='.($start+$count).'&count='.$count.'" >Page suivante</a></li>'."\n";
+          echo '           <li><a href="'.LinkManager::GetInstance()->Generate().'&start='.(count($medias)-$count).'&count='.$count.'" >Dernière page</a></li>'."\n"; 
         }
         echo '          </ul>'."\n";
         
         
-        echo '        </div>'."\n"; 
-        echo '        </div>'."\n";    
-        echo '        <div class="image">'."\n";
-        echo '        <img src="'.$image->GetPath().'" width=800px />'."\n";
         echo '        </div>'."\n";
-        echo '      </div>'."\n";//div image
       }
-    }
-   
+
+  function PrintAlbumsPageBody()
+  {
+        foreach($this->childAlbumList as $album){
+        echo '  <div class=album>'."\n";
+        echo '  <p>Album <a href="'.LinkManager::GetInstance()->GeneratePath($album->GetPath()).'" >'.$album->GetName().'</a> ('.$album->GetDescription().')'.(LoginManager::GetInstance()->IsAccessAllowed($album)?'':' - Accès refusé').'</p>'."\n";
+        echo '  </div>'."\n";
+        }
   }
+
      
   function DisplaySource()
   {
@@ -459,20 +1430,37 @@ class DisplayManager {
 
   function PrintLoginForm($loginFail)
   {
-    echo '      <div  class="image-bloc">'."\n";
-    echo '        <form action="index.php?want=login" method="post" >'."\n";
+    echo '      <div  class="login-bloc">'."\n";
+    echo '        <form action="'.LinkManager::GetInstance()->GenerateWant('login').'" method="post" >'."\n";
     echo '          <ul>'."\n";
-    if($loginFail){
-     echo '            <li class=error >Identifiant ou mot de passe incorrect. Accès refusé.</li>'."\n";
-    }
     echo '            <li>Identifiant : <input name=login type=text /></li>'."\n";
     echo '            <li>Mot de passe : <input name=password type=password /></li>'."\n";
     echo '            <li><input type=submit value="Valider" /></li>'."\n";
+    if($loginFail){
+     echo '            <li class=error >Identifiant ou mot de passe incorrect. Accès refusé.</li>'."\n";
+    }
     echo '          </ul>'."\n";
     echo '        </form>'."\n";
     echo '      </div>'."\n";//div image
   }
   
+  function PrintAccessRefusedPageBody()
+  {
+    echo '      <div  class="login-bloc">'."\n";
+    echo '        <p>'."\n";
+    echo '          Accès refusé pour l\'utilisateur « '.LoginManager::GetInstance()->GetCurrentLogin().' ». Essayer un autre compte ou contacter l\'administrateur.'."\n";
+    echo '        </p>'."\n";
+    echo '      </div>'."\n";//div image
+  }
+  
+  function PrintHelpPageBody()
+  {  
+    echo '      <h1>Documentation - Shrew-gallery v'.Config::GetInstance()->version.'</h1>'."\n";
+    echo '      <h2>Installation</h2>'."\n";
+    echo '        <p>'."\n";
+    echo '          Si vous êtes arrivé ici, c\'est que Shrew-gallery est déjà installé !'."\n";
+    echo '        </p>'."\n";
+  }
 }
 
 
@@ -480,13 +1468,22 @@ class Shrew {
   function Run()
   {
   	//Load config
-    $config = new Config();
-    $config->Load();
+    Config::SetInstance(new Config());
+    Config::GetInstance()->Load();
+    
+    $albumManager = new AlbumManager();      
+    $album = new Album();
+    $album->SetPath(Config::GetInstance()->GetPath());
+    
+    LinkManager::SetInstance(new LinkManager());
+    LinkManager::GetInstance()->SetAlbum($album);
+      
     
     $displayManager = new DisplayManager();
 	  
     //Create Login Manager
     $loginManager = new LoginManager();
+    LoginManager::SetInstance($loginManager);
     $loginManager->Load();
     $loginFail = false;
     if($loginManager->WantLogin())
@@ -494,7 +1491,7 @@ class Shrew {
        $loginFail = !$loginManager->TryLogin();
        if(!$loginFail)
        {
-         header('location: index.php');
+         header('location: '.LinkManager::GetInstance()->Generate());
        }
     }
     
@@ -502,6 +1499,7 @@ class Shrew {
     {
        $loginManager->Logout();
     }
+    
     
     if(isset($_GET['want']) and $_GET['want']== 'logo')
     {
@@ -513,17 +1511,23 @@ class Shrew {
     {
       $displayManager->DisplaySource();
     }
-    else if($loginManager->IsLogged())
+    elseif(isset($_GET['want']) and $_GET['want']== 'help')
     {
-      $imageManager = new ImageManager();
-      $images = $imageManager->GetImages();
-      
-      $displayManager->DisplayImagesPage($images);
-      
+      $displayManager->DisplayHelpPage();
     }
-    else
+    else 
     {
-      $displayManager->DisplayLoginPage($loginFail);
+    
+      
+      if($loginManager->IsAccessAllowed($album)){
+        $displayManager->DisplayImagesPage($album);
+      }else{
+        if($loginManager->IsLogged()){
+          $displayManager->DisplayAccessRefusedPage($album);
+        }else{
+          $displayManager->DisplayLoginPage($album,$loginFail);
+        }
+      }
     }
     
   }

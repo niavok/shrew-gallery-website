@@ -7,4 +7,4 @@
 //rule ./nature admin alice
 //rule ./ville admin bob
 //rule ./divers public
->
+?>
