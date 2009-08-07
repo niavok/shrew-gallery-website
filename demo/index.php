@@ -752,9 +752,9 @@ class Image extends Media{
     $name = preg_replace('!^(.*)(\.[a-zA-Z0-9]+)$!','$1',$this->GetPath());
     $extension = preg_replace('!^(.*)(\.[a-zA-Z0-9]+)$!','$2',$this->GetPath());
    
-     if(file_exists($name.'-thumb'.$thumbIndex.$extension)){
+     if(file_exists($name.'-thumb'.$extension)){
         $thumb = new Image();
-        $thumb->SetPath($name.'-thumb'.$thumbIndex.$extension);
+        $thumb->SetPath($name.'-thumb'.$extension);
         return $thumb;
     }else{
 		return $this;
