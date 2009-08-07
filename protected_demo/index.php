@@ -852,7 +852,7 @@ class MediaManager {
     
     if($is_video){
       $ogg = new Ogg($f);
-      $is_video = ($ogg->GetCodec() == 'theora');
+      $is_video = ($ogg->GetCodec() == 'theora' || $ogg->GetCodec()=='ishead');
     }
 
     
@@ -937,7 +937,7 @@ class Album {
     $albumManager = new AlbumManager();
     $childAlbums = $this->GetChildAlbums();
     foreach($childAlbums as $album){
-      $count += $album->GetMediaCount();
+      $count += $album->GetTotalMediaCount();
     }
     return $count;
   }
@@ -1371,7 +1371,7 @@ function DisplayVideo($medias,$index,$count,$start,$end){
         echo '        </div>'."\n";    
         //Display audio
         echo '        <div class="video">'."\n";
-        echo '        <audio controls=true src="'.$audio->GetPath().'">Votre navigateur ne respecte pas suffisement les standards. Vous pouvez néanmoins téléchager la fichier ici : <a href="'.$audio->GetPath().'" >Original</a></audio>'."\n";
+        echo '        <audio controls=true src="'.$audio->GetPath().'">Votre navigateur ne respecte pas suffisement les standards. Vous pouvez néanmoins téléchager ce fichier ici : <a href="'.$audio->GetPath().'" >Original</a></audio>'."\n";
         echo '        </div>'."\n";
         echo '      </div>'."\n";//div video
   }
