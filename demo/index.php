@@ -33,7 +33,9 @@ class Config {
   {
     if(isset($_GET['path']))
     {
-      $this->path = $_GET['path'];
+	  if(preg_match('!^\.(/[a-zA-Z0-9]+)*$!',$_GET['path'])){
+        $this->path = $_GET['path'];
+	  }
     }	    
   }
   
@@ -42,9 +44,7 @@ class Config {
   }
   
   function GetPath(){
-	if(preg_match('!^\.(/[a-zA-Z0-9]+)*$!',$_GET['path'])){
-      $this->path = $_GET['path'];
-    }
+	return $this->path;
   }
 }
 
