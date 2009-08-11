@@ -16,7 +16,7 @@
  */
 
 class Config{
- public static $version = '1.1.0';
+ public static $version = '1.1.1';
 }
 class Logo {
   
@@ -274,8 +274,10 @@ class DisplayManager {
     echo '       <p>Pour faciliter la gestion des droits, il est possible de définir des groupes et de introduire dans des règles :</p>'."\n";
 	echo '       <p style="font-family: Courier;">//group group1 login2 login3 ...</p>'."\n";
 	echo '       <p style="font-family: Courier;">//rule ./album1/album1.1 login1 group1 group2 login4 ...</p>'."\n";
-	echo '       <p>Un exemple est présent dans l\'archive contenant le code source dans le dossier « examples »</p>'."\n";
-   
+	echo '       <p>Un exemple est présent dans l\'archive contenant le code source dans le dossier « examples ».</p>'."\n";
+ 	echo '       <p>Si vous utilisez une arborescence de dossiers, il est conseillé de créer un fichier nommé « .htaccess » dans le dossier racine contenant la ligne : « Options -Indexes ».</p>'."\n";
+	
+	
     echo '       <h3>Affichage de la licence</h3>'."\n";
 	echo '       <p>Vous pouvez afficher la licence des photos en ajoutant un fichier « licence.txt » dans l\'albums correspondant. Le contenu du fichier (texte ou html) sera affiché en bas de la page. Si aucun de fichier de licence n\'est présent, la gallery va essayer d\'afficher la licence des albums parents.</p>'."\n";
 	
@@ -307,6 +309,11 @@ done</p>'."\n";
     echo '       </ul>'."\n";
 	
 	echo '       <h2 id=changelog>Historique des versions</h2>'."\n";
+	
+	echo '       <h3>Version 1.1.1 - 11/08/2009</h3>'."\n";
+	echo '       <ul>'."\n";
+	echo '        <li>Correction d\'une faille de sécurité</li>'."\n";
+    echo '       </ul>'."\n";
 	
 	echo '       <h3>Version 1.1.0 - 07/08/2009</h3>'."\n";
 	echo '       <ul>'."\n";

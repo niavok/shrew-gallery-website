@@ -4,7 +4,7 @@
 //access bob b
 
 //rule . public
-//rule ./nature admin alice
+//rule ./nature/paysages admin alice
 //rule ./ville admin bob
 //rule ./divers public
 ?>

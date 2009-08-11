@@ -19,7 +19,7 @@ class Config {
   private static $instance;
   public $path = '.';       
   public $licenceFileName = 'licence.txt';
-  public $version = '1.1.0';
+  public $version = '1.1.1';
   
   static function SetInstance($instance){
     self::$instance = $instance;
@@ -42,7 +42,9 @@ class Config {
   }
   
   function GetPath(){
-    return $this->path;
+	if(preg_match('!^\.(/[a-zA-Z0-9]+)*$!',$_GET['path'])){
+      $this->path = $_GET['path'];
+    }
   }
 }
 
