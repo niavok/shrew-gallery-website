@@ -236,11 +236,6 @@ class DisplayManager {
     echo '         <li>Mise à disposition du code source des versions modifiés pour faciliter le respect de la licence.</li>'."\n";
     echo '       </ul>'."\n";
 
-    echo '       <p>Shrew gallery n\'est pas :</p>'."\n";
-    echo '       <ul>'."\n";
-    echo '         <li>Sécurisé : il est quasiment certains que des failles de sécurités se cachent dans ce logiciel. N\'utilisez pas ce logiciel si vos données sont sensibles</li>'."\n";
-    echo '         <li>Optimisé : les images sont téléchargées sans forcement passer par des miniatures. Le temps de téléchargement peut donc être long pour des images de grandes taille. N\'utiliser pas ce logiciel si vous voulez une gallerie très réactive et n\'utilisant que peu de bande passante.</li>'."\n";
-    echo '       </ul>'."\n";
 	
 	//Démonstration
     echo '       <h2 id=demo >Démonstration</h2>'."\n";
