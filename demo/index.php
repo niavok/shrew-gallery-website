@@ -19,7 +19,7 @@ class Config {
   private static $instance;
   public $path = '.';       
   public $licenceFileName = 'licence.txt';
-  public $version = '1.1.1';
+  public $version = '1.1.2';
   
   static function SetInstance($instance){
     self::$instance = $instance;
@@ -33,7 +33,7 @@ class Config {
   {
     if(isset($_GET['path']))
     {
-	  if(preg_match('!^\.(/[a-zA-Z0-9]+)*$!',$_GET['path'])){
+	  if(preg_match('!^\.(/[-a-zA-Z0-9_]+)*$!',$_GET['path'])){
         $this->path = $_GET['path'];
 	  }
     }	    
@@ -902,7 +902,7 @@ class Album {
   	if($this->m_path == '.'){
 		return;
     }
-    return preg_replace('!^(.*)/([-a-zA-Z_.]+)$!','$1',$this->m_path);
+    return preg_replace('!^(.*)/([-a-zA-Z0-9_.]+)$!','$1',$this->m_path);
   }
   
   function SetPath($path)

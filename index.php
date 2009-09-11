@@ -16,7 +16,7 @@
  */
 
 class Config{
- public static $version = '1.1.1';
+ public static $version = '1.1.2';
 }
 class Logo {
   
@@ -309,6 +309,11 @@ done</p>'."\n";
     echo '       </ul>'."\n";
 	
 	echo '       <h2 id=changelog>Historique des versions</h2>'."\n";
+	
+  echo '       <h3>Version 1.1.2 - 11/09/2009</h3>'."\n";
+	echo '       <ul>'."\n";
+	echo '        <li>Correction d\'un bug d\'analyse de chemin</li>'."\n";
+    echo '       </ul>'."\n";
 	
 	echo '       <h3>Version 1.1.1 - 11/08/2009</h3>'."\n";
 	echo '       <ul>'."\n";
