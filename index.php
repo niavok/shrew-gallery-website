@@ -305,7 +305,7 @@ done</p>'."\n";
 	
 	echo '       <h2 id=changelog>Historique des versions</h2>'."\n";
 
-    echo '       <h3>Version 1.1.2 - 19/07/2010</h3>'."\n";
+    echo '       <h3>Version 1.1.3 - 19/07/2010</h3>'."\n";
     echo '       <ul>'."\n";
     echo '        <li>Support du Webm</li>'."\n";
     echo '        <li>Correction de bugs en cas d\'espace dans les noms d\'albums</li>'."\n";
