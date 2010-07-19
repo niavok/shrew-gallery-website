@@ -19,7 +19,7 @@ class Config {
   private static $instance;
   public $path = '.';       
   public $licenceFileName = 'licence.txt';
-  public $version = '1.1.2';
+  public $version = '1.1.3';
   
   static function SetInstance($instance){
     self::$instance = $instance;
@@ -33,7 +33,7 @@ class Config {
   {
     if(isset($_GET['path']))
     {
-	  if(preg_match('!^\.(/[-a-zA-Z0-9_]+)*$!',$_GET['path'])){
+	  if(preg_match('!^\.(/[-a-zA-Z0-9_ ]+)*$!',$_GET['path']) and is_dir($_GET['path'])){
         $this->path = $_GET['path'];
 	  }
     }	    
@@ -769,14 +769,9 @@ class Image extends Media{
 class MediaManager {
   function GetMedias($path)
   {
-    $dir = opendir($path);
-    $medias = array();
-	$files = array();
-	while(false !== ($f = readdir($dir))) {
-	    if($f != '..' && is_file($path.'/'.$f)) {
-			$files[] = $f;
-		}
-	}
+	$medias = array();
+
+	$files = scandir($path);
 	
 	sort($files);
 	
@@ -801,8 +796,6 @@ class MediaManager {
            $medias[] = $audio;
          }
        }
-   
-    closedir($dir);
     return $medias;
   }
   
@@ -848,13 +841,13 @@ class MediaManager {
     
     if(preg_match('#.ogg$#i',$f))
     {
-      $is_video = true;
-    }
-    
-    
-    if($is_video){
       $ogg = new Ogg($f);
       $is_video = ($ogg->GetCodec() == 'theora' || $ogg->GetCodec()=='ishead');
+    }
+
+
+    if(preg_match('#.webm$#i',$f)){
+      $is_video = true;
     }
 
     
@@ -902,7 +895,7 @@ class Album {
   	if($this->m_path == '.'){
 		return;
     }
-    return preg_replace('!^(.*)/([-a-zA-Z0-9_.]+)$!','$1',$this->m_path);
+    return preg_replace('!^(.*)/([-a-zA-Z0-9_. ]+)$!','$1',$this->m_path);
   }
   
   function SetPath($path)
