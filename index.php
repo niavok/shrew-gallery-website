@@ -16,7 +16,7 @@
  */
 
 class Config{
- public static $version = '1.1.2';
+ public static $version = '1.1.3';
 }
 class Logo {
   
@@ -226,7 +226,7 @@ class DisplayManager {
 	
     echo '       <p>Shrew gallery ne possède pas beaucoup de fonctionalités. En fait, il intègre pour le moment seulement l\'essentiel : </p>'."\n";
     echo '       <ul>'."\n";
-    echo '         <li>Affichage des images, videos (ogg/theora) et sons (ogg/vorbis).</li>'."\n";
+    echo '         <li>Affichage des images, videos (ogg/theora, webm) et sons (ogg/vorbis).</li>'."\n";
 	echo '         <li>Creation d\'albums de manière automatique via l\'arborescence de dossier.</li>'."\n";
     echo '         <li>Présentation des images par pages et navigation basique.</li>'."\n";
     echo '         <li>Controle d\'accès globable ou par album.</li>'."\n";
@@ -304,6 +304,13 @@ done</p>'."\n";
     echo '       </ul>'."\n";
 	
 	echo '       <h2 id=changelog>Historique des versions</h2>'."\n";
+
+    echo '       <h3>Version 1.1.2 - 19/07/2010</h3>'."\n";
+    echo '       <ul>'."\n";
+    echo '        <li>Support du Webm</li>'."\n";
+    echo '        <li>Correction de bugs en cas d\'espace dans les noms d\'albums</li>'."\n";
+    echo '       </ul>'."\n";
+
 	
   echo '       <h3>Version 1.1.2 - 11/09/2009</h3>'."\n";
 	echo '       <ul>'."\n";
